@@ -3,6 +3,10 @@ libbson
 
 A library for converting from and to BSON. Also contains a JSON parser/generator based on jsmn.
 
+It is small in size, the shared object has less than 64KB.
+
+There are no dependencies.
+
 Its only export is a single class: BSON::Value. This class can hold any value you want to express in bson.
 You can assign and reference its content either by operator= or by the index operator.
 
