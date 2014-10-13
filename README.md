@@ -22,7 +22,7 @@ A typical example would be this:
     	{"array",BSON::Array{1,2,3}}
     }; 
 
-    it["double"] = 42.23;
+    doc["double"] = 42.23;
 
     for(auto it : doc){
         std::cout<<it.first<<std::endl;
