@@ -27,3 +27,7 @@ A typical example would be this:
 
     std::cout<<doc.toJSON()<<std::endl;
     std::cout<<reDoc.toJSON()<<std::endl; 
+
+It is not complete, i.e. it doesnt contain all the MongoDB specific stuff (like datatypes for ObjectID, Timestamp, or js code)
+
+Beside that it has a very intuitive interface for document building.
