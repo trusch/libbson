@@ -1,6 +1,6 @@
 #include "Value.h"
 
-std::string BSON::Value::toBSON(){
+std::string BSON::Value::toBSON() const {
 	std::string result;
 	BSON::Value docSize;
 	switch(_type){
@@ -34,7 +34,7 @@ std::string BSON::Value::toBSON(){
 		case ARRAY:
 			result = "";
 			for(size_t i=0;i<size();i++){
-				BSON::Value & val = _arrayValue[i];
+				const BSON::Value & val = _arrayValue[i];
 				result.append(val.getTypePrefix())
 					  .append(std::to_string(i))
 					  .push_back('\x00');
@@ -46,9 +46,9 @@ std::string BSON::Value::toBSON(){
             break;
 		case OBJECT:
 			result = "";
-			for(auto it : *this){
-				std::string name = it.first;
-				BSON::Value & val = it.second;
+			for(auto it = cbegin(); it!=cend(); ++it){
+				const std::string name = it->first;
+				const BSON::Value & val = it->second;
 				result.append(val.getTypePrefix())
 					  .append(name)
 					  .push_back('\x00');
@@ -62,7 +62,7 @@ std::string BSON::Value::toBSON(){
 	return result;
 }
 
-std::string BSON::Value::getTypePrefix(){
+std::string BSON::Value::getTypePrefix() const{
 	switch(_type){
 		case UNDEFINED:
 			return "\x0A";

@@ -234,7 +234,7 @@ namespace BSON {
         }
     }
 
-    std::string Value::toJSON() {
+    std::string Value::toJSON() const {
         std::string result;
         switch(_type){
             case UNDEFINED:

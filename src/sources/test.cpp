@@ -19,6 +19,8 @@ int main(){
 	std::string test = doc.toBSON();
 	BSON::Value reDoc = BSON::Value::fromBSON(test);
 
+	std::string & foo = reDoc["string"];
+	std::cout<<foo<<std::endl;
 	std::cout<<doc.toJSON()<<std::endl;
 	std::cout<<reDoc.toJSON()<<std::endl;
 

@@ -63,7 +63,7 @@ namespace BSON {
 		void checkType(enum Type type) const;
 
 		//BSON Helper
-		std::string getTypePrefix();
+		std::string getTypePrefix() const;
 
 	public:
 		Value() : _type{UNDEFINED} {}
@@ -101,29 +101,37 @@ namespace BSON {
 		Value& operator=(const std::map<std::string,Value> & val){checkType(OBJECT); _type=OBJECT; _objectValue=val; return *this;}
 		Value& operator=(const std::vector<Value> & val){checkType(ARRAY); _type=ARRAY; _arrayValue=val; return *this;}
 		
-		std::string getType() const;
-
-		size_t size();
+		bool operator==(const Value & other) const;
+		bool operator!=(const Value & other) const {return !(*this==other);}
 
 		Value& operator[](const std::string & key);
 		Value& operator[](const char * key);
 		Value& operator[](const int & index);
 
-		void push_back(const Value & val);
-		void pop_back();
+		const Value& operator[](const std::string & key) const;
+		const Value& operator[](const char * key) const;
+		const Value& operator[](const int & index) const;
 
 		std::map<std::string,Value>::iterator begin();
 		std::map<std::string,Value>::iterator end();
 
+		std::map<std::string,Value>::const_iterator cbegin() const;
+		std::map<std::string,Value>::const_iterator cend() const;
+
+		void push_back(const Value & val);
+		void pop_back();
+
 		inline void reset(){_type = UNDEFINED;}
 		inline void setType(enum Type type){_type = type;}
+		inline enum Type getType() const {return _type;}
+		size_t size() const;
 
 		//JSON functions
-		std::string toJSON();
+		std::string toJSON() const;
 		static Value fromJSON(const std::string & json);
 
 		//BSON functions
-		std::string toBSON();
+		std::string toBSON() const;
 		static Value fromBSON(const std::string & bson);
 	};
 }
