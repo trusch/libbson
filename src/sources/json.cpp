@@ -195,7 +195,7 @@ namespace BSON {
             if( isJsonPrimitive( str ) ) {
                 Value v;
                 if( isInteger( str ) ) {
-                    v = std::stoi( str );
+                    v = std::stoll( str );
                 }
                 else if( isDouble( str ) ) {
                     v = std::stod( str );
@@ -205,6 +205,8 @@ namespace BSON {
                 }
                 else if( str=="false" ) {
                     v = false;
+                }else if( str=="null" ){
+                    v = Value{};
                 }
                 else {
                     //value is String
@@ -214,7 +216,6 @@ namespace BSON {
                 return v;
             }
             else {
-
                 int r;
                 jsmn_parser p;
                 jsmntok_t tokens[JSON_TOKENS];
@@ -259,7 +260,7 @@ namespace BSON {
                 throw std::runtime_error{"BINARY data type is not representable in json"};
                 break;
             case DATETIME:
-                result = std::to_string(_datetimeValue);
+                result = std::to_string(_datetimeValue.count());
                 break;
             case ARRAY:
                 result = "[";

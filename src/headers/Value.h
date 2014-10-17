@@ -55,7 +55,7 @@ namespace BSON {
 		double                         _doubleValue;
 		bool                           _boolValue;
 		std::string                    _stringValue;
-		int64                          _datetimeValue;
+		std::chrono::milliseconds      _datetimeValue;
 
 		std::map<std::string,Value>    _objectValue;
 		std::vector<Value>             _arrayValue;
@@ -77,7 +77,7 @@ namespace BSON {
 		Value(const std::string & val) : _type{STRING}, _stringValue{val} {}
 		Value(const char * val) : _type{STRING}, _stringValue{val} {}
 		Value(char* data, size_t len) : _type{BINARY}, _stringValue{data,len} {}
-		Value(const std::chrono::milliseconds & val) : _type{DATETIME}, _datetimeValue{val.count()} {}
+		Value(const std::chrono::milliseconds & val) : _type{DATETIME}, _datetimeValue{val} {}
 		Value(const std::map<std::string,Value> & val) : _type{OBJECT}, _objectValue{val} {}
 		Value(const std::vector<Value> & val) : _type{ARRAY}, _arrayValue{val.begin(),val.end()} {}
 
@@ -87,7 +87,7 @@ namespace BSON {
 		operator bool &() {checkType(BOOL); return _boolValue;}
 		operator std::string &() {checkType(STRING); return _stringValue;}
 		operator char*() {checkType(BINARY); return (char*)_stringValue.c_str();}
-		operator std::chrono::milliseconds() const {checkType(DATETIME); return std::chrono::milliseconds{_datetimeValue};}
+		operator std::chrono::milliseconds &() {checkType(DATETIME); return _datetimeValue;}
 		operator std::map<std::string,Value> &() {checkType(OBJECT); return _objectValue;}
 		operator std::vector<Value> &() {checkType(ARRAY); return _arrayValue;}
 
@@ -97,7 +97,7 @@ namespace BSON {
 		Value& operator=(const bool & val){checkType(BOOL); _type=BOOL; _boolValue=val; return *this;}
 		Value& operator=(const std::string & val){checkType(STRING); _type=STRING; _stringValue=val; return *this;}
 		Value& operator=(const char * val){checkType(STRING); _type=STRING; _stringValue=std::string{val}; return *this;}
-		Value& operator=(const std::chrono::milliseconds & val){checkType(DATETIME); _type=DATETIME; _datetimeValue=val.count(); return *this;}
+		Value& operator=(const std::chrono::milliseconds & val){checkType(DATETIME); _type=DATETIME; _datetimeValue=val; return *this;}
 		Value& operator=(const std::map<std::string,Value> & val){checkType(OBJECT); _type=OBJECT; _objectValue=val; return *this;}
 		Value& operator=(const std::vector<Value> & val){checkType(ARRAY); _type=ARRAY; _arrayValue=val; return *this;}
 		
