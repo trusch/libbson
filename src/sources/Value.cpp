@@ -87,6 +87,9 @@ size_t BSON::Value::size() const {
 	if(_type == OBJECT) {
 		return _objectValue.size();
 	}
+	if(_type == STRING || _type == BINARY) {
+		return _stringValue.size();
+	}
 	throw std::runtime_error{"wrong type"};
 }
 
@@ -159,4 +162,56 @@ bool BSON::Value::operator==(const Value & other) const{
 			}
 			return true;
 	}
+}
+
+
+bool BSON::Value::has(const std::string & key) const {
+	if(_type == OBJECT){
+		return _objectValue.count(key) == 1;
+	}
+	return false;
+}
+
+bool BSON::Value::isUndefined() const {
+	return _type == UNDEFINED;
+}
+
+bool BSON::Value::isInteger() const {
+	return isInt64() || isInt32();
+}
+
+bool BSON::Value::isInt64() const {
+	return _type == INT64;
+}
+
+bool BSON::Value::isInt32() const {
+	return _type == INT32;
+}
+
+bool BSON::Value::isDouble() const {
+	return _type == DOUBLE;
+}
+
+bool BSON::Value::isBool() const {
+	return _type == BOOL;
+}
+
+bool BSON::Value::isString() const {
+	return _type == STRING;
+}
+
+bool BSON::Value::isBinary() const {
+	return _type == BINARY;
+}
+
+bool BSON::Value::isDatetime() const {
+	return _type == DATETIME;
+}
+
+bool BSON::Value::isObject() const {
+	return _type == OBJECT;
+}
+
+bool BSON::Value::isArray() const {
+	return _type == ARRAY;
 }

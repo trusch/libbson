@@ -194,10 +194,10 @@ namespace BSON {
         try {
             if( isJsonPrimitive( str ) ) {
                 Value v;
-                if( isInteger( str ) ) {
+                if( BSON::isInteger( str ) ) {
                     v = std::stoll( str );
                 }
-                else if( isDouble( str ) ) {
+                else if( BSON::isDouble( str ) ) {
                     v = std::stod( str );
                 }
                 else if( str=="true" ) {

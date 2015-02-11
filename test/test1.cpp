@@ -10,6 +10,7 @@ TEST(BSON,Basic){
 		{"int64",(int64)1},
 		{"double",3.14},
 		{"true",true},
+		{"binary",Value{"abc",3}},
 		{"false",false},
 		{"string","foobar"},
 		{"datetime",std::chrono::milliseconds{1704}},
@@ -31,6 +32,7 @@ TEST(BSON, Equality){
 		{"int64",(int64)1},
 		{"double",3.14},
 		{"true",true},
+		{"binary",Value{"abc",3}},
 		{"false",false},
 		{"string","foobar"},
 		{"datetime",std::chrono::milliseconds{1704}},
@@ -187,4 +189,95 @@ TEST(BSON,BsonTest){
 
 	EXPECT_EQ(array_document,reconstructed_array);
 	EXPECT_EQ(object_document,reconstructed_object);
+}
+
+TEST(BSON,ConstructFromJSONPrimitiv){
+	std::string pi = "3.14";
+	Value piVal = Value::fromJSON(pi);
+	EXPECT_EQ(DOUBLE,piVal.getType());
+	EXPECT_EQ(3.14,(double)piVal);
+
+	std::string zero = "null";
+	Value zeroVal = Value::fromJSON(zero);
+	EXPECT_EQ(UNDEFINED,zeroVal.getType());
+	EXPECT_EQ(Value{},zeroVal);
+}
+
+TEST(BSON,JsonSpeed){
+	Value undefined;
+	Value integer_32bit{(int32_t)23};
+	Value integer_64bit{(long long)42};
+	Value doubleVal{3.14};
+	Value boolVal{true};
+	Value stringVal{"foobar"};
+	Value date{std::chrono::milliseconds{1704}};
+	Value object{Object{}};
+	Value array{Array{1,2,3}};
+	
+	Value object_document = Object{
+		{"undefined",undefined},
+		{"integer_32bit",integer_32bit},
+		{"integer_64bit",integer_64bit},
+		{"doubleVal",doubleVal},
+		{"boolVal",boolVal},
+		{"stringVal",stringVal},
+		{"date",date},
+		{"object",object},
+		{"array",array}
+	};
+	std::string str;
+	for(int i=0;i<100000;i++){
+		str = object_document.toJSON();
+		object_document = Value::fromJSON(str);
+	}
+}
+
+TEST(BSON,BsonSpeed){
+	Value undefined;
+	Value integer_32bit{(int32_t)23};
+	Value integer_64bit{(long long)42};
+	Value doubleVal{3.14};
+	Value boolVal{true};
+	Value stringVal{"foobar"};
+	Value date{std::chrono::milliseconds{1704}};
+	Value object{Object{}};
+	Value array{Array{1,2,3}};
+	
+	Value object_document = Object{
+		{"undefined",undefined},
+		{"integer_32bit",integer_32bit},
+		{"integer_64bit",integer_64bit},
+		{"doubleVal",doubleVal},
+		{"boolVal",boolVal},
+		{"stringVal",stringVal},
+		{"date",date},
+		{"object",object},
+		{"array",array}
+	};
+	std::string str;
+	for(int i=0;i<100000;i++){
+		str = object_document.toBSON();
+		object_document = Value::fromBSON(str);
+	}
+}
+
+TEST(BSON,size){
+	Value b1{"abc",3};
+	EXPECT_EQ(3,b1.size());
+	
+	Value b2{"abc\0abc",7};
+	EXPECT_EQ(7,b2.size());
+	
+	Value b3{"abc"};
+	EXPECT_EQ(3,b3.size());
+
+	Value b4 = Array{1,2,3};
+	EXPECT_EQ(3,b4.size());
+
+	Value b5 = Object{
+		{"a","a"},
+		{"b","b"},
+		{"c","c"}
+	};
+	EXPECT_EQ(3,b5.size());
 }

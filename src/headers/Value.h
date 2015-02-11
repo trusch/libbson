@@ -76,7 +76,7 @@ namespace BSON {
 		Value(const bool & val) : _type{BOOL}, _boolValue{val} {}
 		Value(const std::string & val) : _type{STRING}, _stringValue{val} {}
 		Value(const char * val) : _type{STRING}, _stringValue{val} {}
-		Value(char* data, size_t len) : _type{BINARY}, _stringValue{data,len} {}
+		Value(const char* data, size_t len) : _type{BINARY}, _stringValue{data,len} {}
 		Value(const std::chrono::milliseconds & val) : _type{DATETIME}, _datetimeValue{val} {}
 		Value(const std::map<std::string,Value> & val) : _type{OBJECT}, _objectValue{val} {}
 		Value(const std::vector<Value> & val) : _type{ARRAY}, _arrayValue{val.begin(),val.end()} {}
@@ -117,6 +117,19 @@ namespace BSON {
 
 		std::map<std::string,Value>::const_iterator cbegin() const;
 		std::map<std::string,Value>::const_iterator cend() const;
+
+		bool has(const std::string & key) const;
+		bool isUndefined() const;
+		bool isInteger() const;
+		bool isInt64() const;
+		bool isInt32() const;
+		bool isDouble() const;
+		bool isBool() const;
+		bool isString() const;
+		bool isBinary() const;
+		bool isDatetime() const;
+		bool isObject() const;
+		bool isArray() const;
 
 		void push_back(const Value & val);
 		void pop_back();

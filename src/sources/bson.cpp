@@ -26,7 +26,9 @@ std::string BSON::Value::toBSON() const {
 			break;
 		case BINARY:
 			docSize = (int32)_stringValue.size();
-			result = docSize.toBSON().append(_stringValue);
+			result = docSize.toBSON();
+			result.push_back('\x00');
+			result.append(_stringValue);
 			break;
 		case DATETIME:
 			result = std::string{(char*) &_datetimeValue,8};
@@ -49,8 +51,8 @@ std::string BSON::Value::toBSON() const {
 			for(auto it = cbegin(); it!=cend(); ++it){
 				const std::string name = it->first;
 				const BSON::Value & val = it->second;
-				result.append(val.getTypePrefix())
-					  .append(name)
+				result.append(val.getTypePrefix());
+				result.append(name)
 					  .push_back('\x00');
 				result.append(val.toBSON());
 			}
@@ -144,7 +146,7 @@ BSON::Value BSON::Value::fromBSON(const std::string & bson){
 				currentByte++;
 				continue;
 			default:
-				throw std::runtime_error{"unsupported BSON type identifier"};
+				throw std::runtime_error{"unsupported BSON type identifier "+std::to_string(docPtr[currentByte])};
 		}
 		current.setType(type);
 		currentByte++;
@@ -153,7 +155,7 @@ BSON::Value BSON::Value::fromBSON(const std::string & bson){
 		if(first && name == "0"){
 			docType = BSON::ARRAY;
 			result.setType(docType);	
-		} 
+		}
 		currentByte += name.size()+1;
 		std::string value;
 		uint32_t len;
@@ -190,13 +192,16 @@ BSON::Value BSON::Value::fromBSON(const std::string & bson){
 				if(docType == BSON::OBJECT) result[name] = value;
 				else result.push_back(value);
 				break;
-			case BSON::BINARY:
+			case BSON::BINARY:{
 				len = *((BSON::int32*)(docPtr+currentByte));
 				currentByte += 4;
 				currentByte++; // binary subtype
-				if(docType == BSON::OBJECT) result[name] = std::string{(const char*)(docPtr+currentByte),len};
-				else result.push_back(std::string{(const char*)(docPtr+currentByte),len});
+				Value val{(const char*)(docPtr+currentByte),len};
+				if(docType == BSON::OBJECT) result[name] = val;
+				else result.push_back(val);
+				currentByte += len;
 				break;
+			}
 			case BSON::DATETIME:
 				if(docType == BSON::OBJECT) result[name] = std::chrono::milliseconds{*((BSON::int64*)(docPtr+currentByte))};
 				else result.push_back(std::chrono::milliseconds{*((BSON::int64*)(docPtr+currentByte))});
