@@ -3,6 +3,7 @@
 
 
 namespace BSON {
+
     bool isInteger(const std::string & s) {
         if( s.empty() || ( ( !isdigit( s[0] ) ) && ( s[0] != '-' ) && ( s[0] != '+' ) ) ) return false ;
         char * p ;
@@ -26,7 +27,7 @@ namespace BSON {
     }
 
     std::string escapeJSON( const std::string& input ) {
-        std::string output;
+        std::string output{};
         output.reserve( input.length() );
 
         for( std::string::size_type i = 0; i < input.length(); ++i )
@@ -70,7 +71,7 @@ namespace BSON {
             UNESCAPED
         };
         State s = UNESCAPED;
-        std::string output;
+        std::string output{};
         output.reserve(input.length());
 
         for (std::string::size_type i = 0; i < input.length(); ++i)
@@ -183,12 +184,6 @@ namespace BSON {
         }
         return result;
     }
-
-
-
-
-    
-
 
     Value Value::fromJSON(const std::string & str){
         try {

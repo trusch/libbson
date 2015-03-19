@@ -66,6 +66,8 @@ namespace BSON {
 		std::string getTypePrefix() const;
 
 	public:
+
+		//basic "from type"-constructors
 		Value() : _type{UNDEFINED} {}
 		Value(const Value & val);
 		Value(const int32 & val) : _type{INT32}, _int32Value{val} {}
@@ -81,6 +83,16 @@ namespace BSON {
 		Value(const std::map<std::string,Value> & val) : _type{OBJECT}, _objectValue{val} {}
 		Value(const std::vector<Value> & val) : _type{ARRAY}, _arrayValue{val.begin(),val.end()} {}
 
+		//move constructors
+		Value(Value && val);
+		Value(std::map<std::string,Value> && val) : _type{OBJECT} {
+			std::swap(_objectValue,val);
+		}
+		Value(std::vector<Value> && val) : _type{ARRAY} {
+			std::swap(_arrayValue,val);
+		}
+
+		//reference back-cast operators
 		operator int32 &() {checkType(INT32); return _int32Value;}
 		operator int64 &() {checkType(INT64); return _int64Value;}
 		operator double &() {checkType(DOUBLE); return _doubleValue;}
@@ -91,16 +103,34 @@ namespace BSON {
 		operator std::map<std::string,Value> &() {checkType(OBJECT); return _objectValue;}
 		operator std::vector<Value> &() {checkType(ARRAY); return _arrayValue;}
 
-		Value& operator=(const int32 & val){checkType(INT32); _type=INT32; _int32Value=val; return *this;}
-		Value& operator=(const int64 & val){checkType(INT64); _type=INT64; _int64Value=val; return *this;}
-		Value& operator=(const double & val){checkType(DOUBLE); _type=DOUBLE; _doubleValue=val; return *this;}
-		Value& operator=(const bool & val){checkType(BOOL); _type=BOOL; _boolValue=val; return *this;}
-		Value& operator=(const std::string & val){checkType(STRING); _type=STRING; _stringValue=val; return *this;}
-		Value& operator=(const char * val){checkType(STRING); _type=STRING; _stringValue=std::string{val}; return *this;}
-		Value& operator=(const std::chrono::milliseconds & val){checkType(DATETIME); _type=DATETIME; _datetimeValue=val; return *this;}
-		Value& operator=(const std::map<std::string,Value> & val){checkType(OBJECT); _type=OBJECT; _objectValue=val; return *this;}
-		Value& operator=(const std::vector<Value> & val){checkType(ARRAY); _type=ARRAY; _arrayValue=val; return *this;}
+		//copy back-cast operators
+		operator int32() const {checkType(INT32); return _int32Value;}
+		operator int64() const {checkType(INT64); return _int64Value;}
+		operator double() const {checkType(DOUBLE); return _doubleValue;}
+		operator bool() const {checkType(BOOL); return _boolValue;}
+		operator std::string() const {checkType(STRING); return _stringValue;}
+		operator const char*() {checkType(BINARY); return (char*)_stringValue.c_str();}
+		operator std::chrono::milliseconds() const {checkType(DATETIME); return _datetimeValue;}
+		operator std::map<std::string,Value>() const {checkType(OBJECT); return _objectValue;}
+		operator std::vector<Value>() const {checkType(ARRAY); return _arrayValue;}
+
+		//copy assignment operators
+		Value& operator=(const Value & val);
+		Value& operator=(const int32 & val){_type=INT32; _int32Value=val; return *this;}
+		Value& operator=(const int64 & val){_type=INT64; _int64Value=val; return *this;}
+		Value& operator=(const double & val){_type=DOUBLE; _doubleValue=val; return *this;}
+		Value& operator=(const bool & val){_type=BOOL; _boolValue=val; return *this;}
+		Value& operator=(const std::string & val){_type=STRING; _stringValue=val; return *this;}
+		Value& operator=(const char * val){_type=STRING; _stringValue=std::string{val}; return *this;}
+		Value& operator=(const std::chrono::milliseconds & val){_type=DATETIME; _datetimeValue=val; return *this;}
+		Value& operator=(const std::map<std::string,Value> & val){_type=OBJECT; _objectValue=val; return *this;}
+		Value& operator=(const std::vector<Value> & val){_type=ARRAY; _arrayValue=val; return *this;}
 		
+		//move assignment operators
+		Value& operator=(Value && val);
+		Value& operator=(std::map<std::string,Value> && val){_type=OBJECT; std::swap(_objectValue,val); return *this;}
+		Value& operator=(std::vector<Value> && val){_type=ARRAY; std::swap(_arrayValue,val); return *this;}
+
 		bool operator==(const Value & other) const;
 		bool operator!=(const Value & other) const {return !(*this==other);}
 
