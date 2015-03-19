@@ -10,8 +10,7 @@ include_directories( ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR} )
 
 set( SRC ${CMAKE_SOURCE_DIR}/src/sources/Value.cpp 
 				 ${CMAKE_SOURCE_DIR}/src/sources/bson.cpp
-				 ${CMAKE_SOURCE_DIR}/src/sources/json.cpp
-				 ${CMAKE_SOURCE_DIR}/src/sources/jsmn.cpp )
+				 ${CMAKE_SOURCE_DIR}/src/sources/json.cpp )
 
 set( TESTS ${CMAKE_SOURCE_DIR}/test/test1.cpp )
 
