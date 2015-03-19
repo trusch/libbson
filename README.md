@@ -1,7 +1,7 @@
 libbson
 =======
 
-A library for converting from and to BSON. Also contains a JSON parser/generator based on jsmn.
+A library for converting from and to BSON. Also contains a JSON parser/generator based on rapidjson.
 
 It is small in size, the shared object has less than 64KB.
 
