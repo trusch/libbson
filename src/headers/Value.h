@@ -173,6 +173,8 @@ namespace BSON {
 		std::string toJSON() const;
 		static Value fromJSON(const std::string & json);
 
+		static std::string readPrimitiveFromJSON(char * & data, const char * end);
+
 		//BSON functions
 		std::string toBSON() const;
 		static Value fromBSON(const std::string & bson);

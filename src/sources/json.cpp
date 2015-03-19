@@ -1,30 +1,79 @@
 #include "Value.h"
-#include "jsmn.h"
-
+#include "rapidjson/reader.h"
 
 namespace BSON {
 
-    bool isInteger(const std::string & s) {
-        if( s.empty() || ( ( !isdigit( s[0] ) ) && ( s[0] != '-' ) && ( s[0] != '+' ) ) ) return false ;
-        char * p ;
-        strtol( s.c_str(), &p, 10 ) ;
-        return ( *p == 0 ) ;
-    }
+    struct JsonHandler {
+        std::vector<Object> objects;
+        std::vector<Array> arrays;
+        std::vector<Value> values;
+        std::vector<std::string> keys;
 
-    bool isDouble(const std::string & s) {
-        std::stringstream ss( s );
-        double d;
-        return ( ss >> d ) && ( ss >> std::ws ).eof();
-    }
-
-    bool isJsonPrimitive( const std::string & str ) {
-        if( str.find( "{" ) != std::string::npos ||
-                str.find( "[" ) != std::string::npos ||
-                str.find( "\"" ) != std::string::npos ) {
-            return false;
+        bool Null() {
+            values.push_back(Value{});
+            return true; 
         }
-        return true;
-    }
+        bool Bool(bool b) {
+            values.push_back(b);
+            return true; 
+        }
+        bool Int(int i) {
+            values.push_back(int64(i));
+            return true; 
+        }
+        bool Uint(unsigned u) {
+            values.push_back(int64(u));
+            return true; 
+        }
+        bool Int64(int64_t i) {
+            values.push_back(int64(i));
+            return true; 
+        }
+        bool Uint64(uint64_t u) {
+            values.push_back(int64(u));
+            return true; 
+        }
+        bool Double(double d) {
+            values.push_back(d);
+            return true; 
+        }
+        bool String(const char* str, rapidjson::SizeType length, bool copy) {
+            values.push_back(std::string{str,length});
+            return true;
+        }
+        bool StartObject() {
+            objects.push_back(Object{});
+            return true; 
+        }
+        bool Key(const char* str, rapidjson::SizeType length, bool copy) {
+            keys.push_back(std::string{str,length});
+            return true;
+        }
+        bool EndObject(rapidjson::SizeType memberCount) {
+            for(int i=0;i<memberCount;i++){
+                objects.back()[keys.back()] = values.back();
+                keys.pop_back();
+                values.pop_back();
+            }
+            values.push_back(objects.back());
+            objects.pop_back();
+            return true; 
+        }
+        bool StartArray() {
+            arrays.push_back(Array{}); 
+            return true; 
+        }
+        bool EndArray(rapidjson::SizeType elementCount) {
+            for(int i=0;i<elementCount;i++){
+                arrays.back().push_back(values[values.size()-elementCount+i]);
+            }
+            values.erase(values.begin()+(values.size()-elementCount),values.end());
+            values.push_back(arrays.back());
+            arrays.pop_back();
+            return true; 
+        }
+    };
+
 
     std::string escapeJSON( const std::string& input ) {
         std::string output{};
@@ -65,169 +114,16 @@ namespace BSON {
         return output;
     }
 
-    std::string unescapeJSON(const std::string& input) {
-        enum State {
-            ESCAPED,
-            UNESCAPED
-        };
-        State s = UNESCAPED;
-        std::string output{};
-        output.reserve(input.length());
-
-        for (std::string::size_type i = 0; i < input.length(); ++i)
-        {
-            switch(s)
-            {
-                case ESCAPED:
-                    {
-                        switch(input[i])
-                        {
-                            case '"':
-                                output += '\"';
-                                break;
-                            case '/':
-                                output += '/';
-                                break;
-                            case 'b':
-                                output += '\b';
-                                break;
-                            case 'f':
-                                output += '\f';
-                                break;
-                            case 'n':
-                                output += '\n';
-                                break;
-                            case 'r':
-                                output += '\r';
-                                break;
-                            case 't':
-                                output += '\t';
-                                break;
-                            case '\\':
-                                output += '\\';
-                                break;
-                            default:
-                                output += input[i];
-                                break;
-                        }
-
-                        s = UNESCAPED;
-                        break;
-                    }
-                case UNESCAPED:
-                    {
-                        switch(input[i])
-                        {
-                            case '\\':
-                                s = ESCAPED;
-                                break;
-                            default:
-                                output += input[i];
-                                break;
-                        }
-                    }
-            }
-        }
-        return output;
-    }
-
-    Value tokenToValue( jsmntok_t * & t, const  char *js ) {
-        Value result;
-        switch( t->type ) {
-            case JSMN_OBJECT: {
-                int objectSize = t->size;
-                t++;
-                result = Object {};
-                for( int i=0; i<objectSize; i+=2 ) {
-                    std::string key = tokenToValue( t,js );
-                    Value value = tokenToValue( t,js );
-                    result[key] = value;
-                }
-                break;
-            }
-            case JSMN_ARRAY: {
-                int arraySize = t->size;
-                t++;
-                result = Array {};
-                for( int i=0; i<arraySize; i++ ) {
-                    Value value = tokenToValue( t,js );
-                    result.push_back( value );
-                }
-                break;
-            }
-            case JSMN_STRING: {
-                std::string value {js+( t->start ),js+( t->end )};
-                result = unescapeJSON(value);
-                t++;
-                break;
-            }
-            case JSMN_PRIMITIVE: {
-                std::string str {js+( t->start ),js+( t->end )};
-                if( str.compare( "null" ) == 0 ) {
-                    result = Value {};
-                }
-                else if( str.compare( "true" ) == 0 ) {
-                    result = true;
-                }
-                else if( str.compare( "false" ) == 0 ) {
-                    result = false;
-                }
-                else if( str.find( '.' ) != std::string::npos ) {
-                    result = std::stod( str );
-                }
-                else {
-                    result = std::stoll( str );
-                }
-                t++;
-                break;
-            }
-        }
-        return result;
-    }
 
     Value Value::fromJSON(const std::string & str){
-        try {
-            if( isJsonPrimitive( str ) ) {
-                Value v;
-                if( BSON::isInteger( str ) ) {
-                    v = std::stoll( str );
-                }
-                else if( BSON::isDouble( str ) ) {
-                    v = std::stod( str );
-                }
-                else if( str=="true" ) {
-                    v = true;
-                }
-                else if( str=="false" ) {
-                    v = false;
-                }else if( str=="null" ){
-                    v = Value{};
-                }
-                else {
-                    //value is String
-                    v = unescapeJSON(str);
-                }
-
-                return v;
-            }
-            else {
-                int r;
-                jsmn_parser p;
-                jsmntok_t tokens[JSON_TOKENS];
-                jsmn_init( &p );
-                r = jsmn_parse( &p, str.c_str(), str.size(), tokens, JSON_TOKENS );
-
-                if( r < 0 ) {
-                    throw std::runtime_error {"Value::fromJSONString parse error"};
-                }
-
-                jsmntok_t * start = &tokens[0];
-                return tokenToValue( start,str.c_str() );
-            }
+        rapidjson::Reader reader;
+        rapidjson::StringStream ss{str.c_str()};
+        JsonHandler handler;
+        reader.Parse(ss,handler);
+        if(handler.values.size() == 1){
+           return handler.values[0];    
         }
-        catch( ... ) {
-            return Value {};
-        }
+        return Value{};
     }
 
     std::string Value::toJSON() const {
@@ -284,4 +180,5 @@ namespace BSON {
         }
         return result;
     }
+
 }

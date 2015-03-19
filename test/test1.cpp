@@ -125,8 +125,8 @@ TEST(BSON,JsonPrimitiveTest){
 	Value boolVal{true};
 	Value stringVal{"foobar"};
 	Value date{std::chrono::milliseconds{1704}};
-	Value object{Object{}};
-	Value array{Array{}};
+	Value object{Object{{"foo","bar"}}};
+	Value array{Array{int64(1),int64(2),int64(3)}};
 	
 	Value undefined_copy{Value::fromJSON(undefined.toJSON())};
 	Value integer_32bit_copy{Value::fromJSON(integer_32bit.toJSON())};
