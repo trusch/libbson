@@ -109,10 +109,20 @@ namespace BSON {
 		operator double() const {checkType(DOUBLE); return _doubleValue;}
 		operator bool() const {checkType(BOOL); return _boolValue;}
 		operator std::string() const {checkType(STRING); return _stringValue;}
-		operator const char*() {checkType(BINARY); return (char*)_stringValue.c_str();}
+		operator const char*() const {checkType(BINARY); return (const char*)_stringValue.c_str();}
 		operator std::chrono::milliseconds() const {checkType(DATETIME); return _datetimeValue;}
 		operator std::map<std::string,Value>() const {checkType(OBJECT); return _objectValue;}
 		operator std::vector<Value>() const {checkType(ARRAY); return _arrayValue;}
+
+		int32 getInt32() const {checkType(INT32); return _int32Value;}
+		int64 getInt64() const {checkType(INT64); return _int64Value;}
+		double getDouble() const {checkType(DOUBLE); return _doubleValue;}
+		bool getBool() const {checkType(BOOL); return _boolValue;}
+		std::string getString() const {checkType(STRING); return _stringValue;}
+		const char* getBinary() {checkType(BINARY); return (const char*)_stringValue.c_str();}
+		std::chrono::milliseconds getDatetime() const {checkType(DATETIME); return _datetimeValue;}
+		std::map<std::string,Value> getObject() const {checkType(OBJECT); return _objectValue;}
+		std::vector<Value> getArray() const {checkType(ARRAY); return _arrayValue;}
 
 		//copy assignment operators
 		Value& operator=(const Value & val);
