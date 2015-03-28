@@ -14,7 +14,7 @@ set( SRC ${CMAKE_SOURCE_DIR}/src/sources/Value.cpp
 
 set( TESTS ${CMAKE_SOURCE_DIR}/test/test1.cpp )
 
-set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --std=c++11 -fPIC -Os -O3 -g" )
+set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --std=c++11 -fPIC -Os -O3" )
 
 add_library( bson SHARED ${SRC} )
 add_library( bson_static STATIC ${SRC} )
@@ -28,5 +28,5 @@ target_link_libraries( bson_test gtest_main )
 install(TARGETS bson bson_static
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib)
-install(DIRECTORY src/headers/ DESTINATION include/bson
+install(DIRECTORY src/headers/bson DESTINATION include/bson
         FILES_MATCHING PATTERN "Value.h")

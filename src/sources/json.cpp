@@ -1,5 +1,5 @@
-#include "Value.h"
-#include "rapidjson/reader.h"
+#include "bson/Value.h"
+#include "bson/rapidjson/reader.h"
 
 namespace BSON {
 
