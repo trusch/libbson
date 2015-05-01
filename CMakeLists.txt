@@ -7,8 +7,10 @@ include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/src/headers )
 
 if( NOT TARGET gtest OR NOT TARGET gtest_main)
 	add_subdirectory( ${CMAKE_CURRENT_SOURCE_DIR}/test/gtest-1.7.0 )
-	include_directories( ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR} )
 endif()
+include_directories( ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR} )
+
+
 
 set( SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/sources/Value.cpp 
 				 ${CMAKE_CURRENT_SOURCE_DIR}/src/sources/bson.cpp
