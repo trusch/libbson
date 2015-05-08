@@ -50,7 +50,7 @@ namespace BSON {
             return true;
         }
         bool EndObject(rapidjson::SizeType memberCount) {
-            for(int i=0;i<memberCount;i++){
+            for(rapidjson::SizeType i=0;i<memberCount;i++){
                 objects.back()[keys.back()] = values.back();
                 keys.pop_back();
                 values.pop_back();
@@ -64,7 +64,7 @@ namespace BSON {
             return true; 
         }
         bool EndArray(rapidjson::SizeType elementCount) {
-            for(int i=0;i<elementCount;i++){
+            for(rapidjson::SizeType i=0;i<elementCount;i++){
                 arrays.back().push_back(values[values.size()-elementCount+i]);
             }
             values.erase(values.begin()+(values.size()-elementCount),values.end());

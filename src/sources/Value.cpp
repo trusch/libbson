@@ -238,6 +238,7 @@ bool BSON::Value::operator==(const Value & other) const{
 			}
 			return true;
 	}
+	return true;
 }
 
 

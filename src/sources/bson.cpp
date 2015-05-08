@@ -97,6 +97,7 @@ std::string BSON::Value::getTypePrefix() const{
 			return "\x03";
             break;
 	}
+	return "\x00";
 }
 
 
