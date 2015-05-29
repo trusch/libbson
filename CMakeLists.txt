@@ -32,5 +32,5 @@ target_link_libraries( bson_test gtest_main )
 install(TARGETS bson bson_static
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib)
-install(DIRECTORY src/headers/bson DESTINATION include/bson
+install(DIRECTORY src/headers/bson DESTINATION /usr/local/include
         FILES_MATCHING PATTERN "Value.h")
