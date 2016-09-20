@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 2.8.11)
 project (libbson)
 
 set( CMAKE_COLOR_MAKEFILE ON )
-include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/src/headers )
+include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/include )
 
 if( NOT TARGET gtest OR NOT TARGET gtest_main)
 	add_subdirectory( ${CMAKE_CURRENT_SOURCE_DIR}/test/gtest-1.7.0 )
@@ -12,7 +12,7 @@ include_directories( ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR} )
 
 
 
-set( SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/sources/Value.cpp 
+set( SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/sources/Value.cpp
 				 ${CMAKE_CURRENT_SOURCE_DIR}/src/sources/bson.cpp
 				 ${CMAKE_CURRENT_SOURCE_DIR}/src/sources/json.cpp )
 
