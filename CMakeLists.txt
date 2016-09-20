@@ -18,7 +18,7 @@ set( SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/sources/Value.cpp
 
 set( TESTS ${CMAKE_CURRENT_SOURCE_DIR}/test/test1.cpp )
 
-set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --std=c++11 -fPIC -Os -O3" )
+set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --std=c++11 -fPIC -O3" )
 
 add_library( bson SHARED ${SRC} )
 add_library( bson_static STATIC ${SRC} )
@@ -34,3 +34,12 @@ install(TARGETS bson bson_static
         ARCHIVE DESTINATION lib)
 install(DIRECTORY src/headers/bson DESTINATION /usr/local/include
         FILES_MATCHING PATTERN "Value.h")
+
+set(CPACK_GENERATOR "DEB")
+set(CPACK_SET_DESTDIR ON)
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Tino Rusch")
+set(CPACK_PACKAGE_VERSION "1.0.0")
+set(CPACK_PACKAGE_VERSION_MAJOR "1")
+set(CPACK_PACKAGE_VERSION_MINOR "0")
+set(CPACK_PACKAGE_VERSION_PATCH "0")
+include(CPack)
