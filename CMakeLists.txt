@@ -6,7 +6,7 @@ set( CMAKE_COLOR_MAKEFILE ON )
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/include )
 
 if( NOT TARGET gtest OR NOT TARGET gtest_main)
-	add_subdirectory( ${CMAKE_CURRENT_SOURCE_DIR}/test/gtest-1.7.0 )
+	add_subdirectory( ${CMAKE_CURRENT_SOURCE_DIR}/test/googletest )
 endif()
 include_directories( ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR} )
 
